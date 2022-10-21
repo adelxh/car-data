@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "assesment",
-    "slug": "assesment",
+    "slug": "car-api",
+    "owner": "adelaxmed",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,16 +19,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adelaxmed.carapi"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.adelaxmed.carapi"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9b86964e-9c71-4891-85ca-f4e178ed2e74"
+      }
     }
   }
 }
