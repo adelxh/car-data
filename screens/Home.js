@@ -7,6 +7,7 @@ import Slider from '@react-native-community/slider';
 const Home = ({ navigation }) => {
 
   const [isLoading, setLoading] = useState(true);
+  const [isShowing, setShowing] = useState(false); 
   const [data, setData] = useState([]);
   const [nameData, setNameData] = useState([]); 
   const [carYear, setCarYear] = useState([]);
@@ -22,7 +23,8 @@ const Home = ({ navigation }) => {
 
   const [range, setRangeMin] = useState("");    // slider min
   const [rangeMax, setRangeMax] = useState("");     // slider max
-  
+  let minRange = 1970; 
+  let maxRange = 2022;
   let listViewRef; // scroll to top
 
   const getMovies = async () => {
@@ -69,6 +71,7 @@ const Home = ({ navigation }) => {
     } finally {
       setLoading(false);  // set loading off
       setModal(false);  // close modal 
+      setShowing(true); 
     }
   }
 
@@ -122,36 +125,24 @@ const applyAllFilters = () => {
 
   const newData = data.filter((item) => {
       // if all filters are not correct or missing, throw alert
-    if (item.car != select && item.car_color != selectColor && item.car_model_year != selectYear) {
-      alert("Please select all 3 filters"); 
+    // if (item.car != select && item.car_color != selectColor && item.car_model_year != range) {
+    //   alert("Please select all 3 filters"); 
       
+    // }
+    if (item.car !== select && item.car_color !== selectColor && item.car_model_year != range) {
+        setShowing(false); 
     }
-    else {
+   else {
         // all filters must be accurate
       return item.car === select && item.car_color === selectColor && item.car_model_year == range; 
-    }
+   }
 
       
       });
       setData(newData); 
       setModal(false);
 }
-const advancedFilterPrice = () => {
- 
-  const newData = data.filter((item) => {
-    if (parseInt(item.price) <= range) {
-        return parseInt(item.price) == range; 
-    }
-     else {
-       alert("Price not working")
-     }
-    
-    });
 
-  setData(newData); 
-  setModal(false);
-  
-}
 
 const TopButtonHandler = () => {
   listViewRef.scrollToOffset({offset: 0, animated: true}); // scrolls to the top of the page
@@ -182,8 +173,8 @@ const TopButtonHandler = () => {
        <TouchableOpacity onPress={advancedFilterName} style={styles.apply}><Text style={{textAlign: 'center', fontSize: 18, color: 'white'}}>Apply Filter</Text></TouchableOpacity>
       
        <Text style={{marginTop: 30, fontSize: 18, paddingBottom: 10}}>Filter by year (min-max): {range} - {rangeMax}</Text>
-       <Slider maximumValue={1} minimumValue={0} setSelected={setRangeMin} onSelect={selectYear} onValueChange={value => setRangeMin(parseInt(value * 2022))} />
-       <Slider maximumValue={1} minimumValue={0} setSelected={setRangeMax} onValueChange={value => setRangeMax(parseInt(value * 2022))} />
+       <Slider maximumValue={maxRange} minimumValue={minRange} setSelected={setRangeMin} onValueChange={value => setRangeMin(parseInt(value * 1))} />
+       <Slider maximumValue={maxRange} minimumValue={minRange} setSelected={setRangeMax} onValueChange={value => setRangeMax(parseInt(value * 1))} />
          <TouchableOpacity onPress={advancedFilterYear} style={styles.apply}><Text style={{textAlign: 'center', fontSize: 18, color: 'white'}}>Apply Filter</Text></TouchableOpacity>
          
         
@@ -198,7 +189,7 @@ const TopButtonHandler = () => {
     marginTop: 30
   }}
 />
-       <TouchableOpacity onPress={applyAllFilters} style={styles.save}><Text style={{textAlign: 'center'}}>Apply All</Text></TouchableOpacity>
+       <TouchableOpacity onPress={applyAllFilters} style={styles.save}><Text style={{textAlign: 'center', color: 'white', fontWeight: '600'}}>Apply All</Text></TouchableOpacity>
        <TouchableOpacity onPress={getMovies} style={styles.clear}><Text style={{textAlign: 'center'}}>Clear</Text></TouchableOpacity>
        </View>
       </ScrollView>
@@ -206,7 +197,7 @@ const TopButtonHandler = () => {
    
     </View>
     <View>
-      {isLoading ? <Text>No cars available with these filters...</Text> : (
+      {isShowing ?  (
         <FlatList
           data={data}
           keyExtractor={({ id }, index) => id}
@@ -236,13 +227,17 @@ const TopButtonHandler = () => {
          
             </View>
             </TouchableOpacity>
-          )}
+          ) }
         
           
         />
 
         
-      )}
+      )
+      : ( <View style={{marginTop: 40}}>
+          <Image style={{width: 200, height: 200, marginLeft: 80}} source={{uri: 'https://www.cambridge.org/elt/blog/wp-content/uploads/2019/07/Sad-Face-Emoji-480x480.png.webp'}} />
+        <Text style={{fontSize: 20, marginTop: 20}}>Sorry no cars with this filter are available</Text>
+    </View> )}
 
         </View>
         <TouchableOpacity onPress={TopButtonHandler} style={[styles.topBtn, { right: 30, bottom: 40}]}><Text style={{fontSize: 50, top: 4, left: 1, color: 'white'}}>^</Text></TouchableOpacity>
@@ -293,7 +288,7 @@ clear: {
   borderWidth: 1, 
   paddingTop: 8,
   paddingBottom: 8,
-  borderRadius: 40, 
+  borderRadius: 10, 
   marginTop: 10
 
 

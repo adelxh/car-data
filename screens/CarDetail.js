@@ -13,7 +13,7 @@ return (
             <Text style={styles.header}>FULL CAR DETAIL</Text>
              <Text style={styles.title}>{name} {model}</Text>
              <Text style={styles.title}>{year}</Text>
-             <Text style={styles.title}>{vin}</Text>
+             <Text style={styles.title}>VIN #: {vin}</Text>
              <Text style={styles.title}>{price}/day</Text>
              { available  // if the car is available then shows available in green
              ? ( <Text style={styles.av}>available</Text> ) 
@@ -25,10 +25,10 @@ return (
 
              </ImageBackground>
     
-</View>
-)
+    </View>
+    )
   
-};
+ };
 
 // stylesheet for the UI 
 
