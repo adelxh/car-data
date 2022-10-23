@@ -7,7 +7,6 @@ import Slider from '@react-native-community/slider';
 const Home = ({ navigation }) => {
 
   const [isLoading, setLoading] = useState(true);
-  const [isShowing, setShowing] = useState(false); 
   const [data, setData] = useState([]);
   const [nameData, setNameData] = useState([]); 
   const [carYear, setCarYear] = useState([]);
@@ -17,17 +16,15 @@ const Home = ({ navigation }) => {
   const [modal, setModal] = useState(false); // open or close filter modal 
   const [select, setSelected] = useState(""); // name of the car
   const [selectColor, setSelectedColor] = useState(""); // color of the car
-  const [selectYear, setSelectedYear] = useState(""); // year of the car
-  const [selectPrice, setSelectPrice] = useState(""); // price of the car / daily rate
- 
+  
 
   const [range, setRangeMin] = useState("");    // slider min
   const [rangeMax, setRangeMax] = useState("");     // slider max
   let minRange = 1970; 
-  let maxRange = 2022;
+  let maxRange = new Date().getFullYear();
   let listViewRef; // scroll to top
 
-  const getMovies = async () => {
+  const getCars = async () => {
      try {
       const response = await fetch('https://myfakeapi.com/api/cars/');
       const json = await response.json();
@@ -71,7 +68,7 @@ const Home = ({ navigation }) => {
     } finally {
       setLoading(false);  // set loading off
       setModal(false);  // close modal 
-      setShowing(true); 
+     
     }
   }
 
@@ -124,20 +121,10 @@ const Home = ({ navigation }) => {
 const applyAllFilters = () => {
 
   const newData = data.filter((item) => {
-      // if all filters are not correct or missing, throw alert
-    // if (item.car != select && item.car_color != selectColor && item.car_model_year != range) {
-    //   alert("Please select all 3 filters"); 
-      
-    // }
-    if (item.car !== select && item.car_color !== selectColor && item.car_model_year != range) {
-        setShowing(false); 
-    }
-   else {
+    
         // all filters must be accurate
       return item.car === select && item.car_color === selectColor && item.car_model_year == range; 
-   }
-
-      
+    
       });
       setData(newData); 
       setModal(false);
@@ -150,7 +137,7 @@ const TopButtonHandler = () => {
 
 
   useEffect(() => {
-    getMovies(); // outputs data when app is loaded
+    getCars(); // outputs data when app is loaded
 
 
   }, []);
@@ -190,14 +177,14 @@ const TopButtonHandler = () => {
   }}
 />
        <TouchableOpacity onPress={applyAllFilters} style={styles.save}><Text style={{textAlign: 'center', color: 'white', fontWeight: '600'}}>Apply All</Text></TouchableOpacity>
-       <TouchableOpacity onPress={getMovies} style={styles.clear}><Text style={{textAlign: 'center'}}>Clear</Text></TouchableOpacity>
+       <TouchableOpacity onPress={getCars} style={styles.clear}><Text style={{textAlign: 'center'}}>Clear</Text></TouchableOpacity>
        </View>
       </ScrollView>
     </Modal>
    
     </View>
     <View>
-      {isShowing ?  (
+      {isLoading ? <Text>Loading...</Text> : (
         <FlatList
           data={data}
           keyExtractor={({ id }, index) => id}
@@ -206,14 +193,14 @@ const TopButtonHandler = () => {
           }}
         
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => navigation.navigate('Details',  {name: item.car, year: item.car_model_year, vin: item.car_vin, price: item.price, model: item.car_model, available: item.availability} )}>
+            <TouchableOpacity onPress={() => navigation.navigate('Details',  {name: item.car, year: item.car_model_year, vin: item.car_vin, price: item.price, model: item.car_model, available: item.availability, color: item.car_color} )}>
             <View style={[styles.shadowProp, styles.carCard]}>
-            <Text style={{marginTop: 50, textAlign: 'center', fontSize: 26, color: 'grey', fontWeight: '700'}}>{item.car} {item.car_model}</Text>
+            <Text style={{marginTop: 50, textAlign: 'center', fontSize: 26, color: 'grey', fontWeight: '700'}}>{item.car_model_year} {item.car} {item.car_model}</Text>
             <Text style={{textAlign: 'center'}}></Text>
-            <Text style={{fontSize: 20}}>{item.availability ? (<Text style={{color: 'green', textAlign: 'center'}}>available</Text>) : (<Text style={{color: 'red', textAlign: 'center'}}>not available</Text>)}</Text>
+            <Text style={{fontSize: 20, textAlign: 'center'}}>{item.availability ? (<Text style={{color: 'green', textAlign: 'center'}}>available</Text>) : (<Text style={{color: 'red', textAlign: 'center'}}>not available</Text>)}</Text>
             <Text style={{textAlign:'center', marginTop: 13, fontWeight: '700', fontSize: 17}}>{item.car_color}</Text>
             <Text style={{textAlign:'center', marginTop: 13, fontWeight: '700', fontSize: 17}}>{item.price}/day</Text>
-            <Text style={{textAlign:'center', marginTop: 13, fontWeight: '700', fontSize: 17}}>{item.car_model_year}</Text>
+
             <View
               style={{
                 borderBottomColor: 'black',
@@ -233,11 +220,7 @@ const TopButtonHandler = () => {
         />
 
         
-      )
-      : ( <View style={{marginTop: 40}}>
-          <Image style={{width: 200, height: 200, marginLeft: 80}} source={{uri: 'https://www.cambridge.org/elt/blog/wp-content/uploads/2019/07/Sad-Face-Emoji-480x480.png.webp'}} />
-        <Text style={{fontSize: 20, marginTop: 20}}>Sorry no cars with this filter are available</Text>
-    </View> )}
+      )}
 
         </View>
         <TouchableOpacity onPress={TopButtonHandler} style={[styles.topBtn, { right: 30, bottom: 40}]}><Text style={{fontSize: 50, top: 4, left: 1, color: 'white'}}>^</Text></TouchableOpacity>
